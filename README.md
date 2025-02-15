@@ -41,15 +41,19 @@ Geo64 is an alternative geospatial encoding format based on the traditional Geoh
 
 ## Examples
 `0d`
+
 ![0d](https://github.com/user-attachments/assets/9b0e04c7-44c8-4569-a5d1-a781ca5499ca)
 
 `0BPI`
+
 ![0BPI](https://github.com/user-attachments/assets/570d23e5-bf08-4e8b-bfbf-5d939fd6a944)
 
 `x2Nfw`
+
 ![x2Nfw](https://github.com/user-attachments/assets/cac1b7d1-08ad-4bf7-89c4-75782b91a013)
 
 `x2NfwPMa`
+
 ![x2NfwPMa](https://github.com/user-attachments/assets/3f65913a-4eb1-497f-970d-32f52d7e4f4e)
 
 The last one is so small it is very difficult to even notice where it is.
