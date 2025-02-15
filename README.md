@@ -63,4 +63,4 @@ It is more compact than Geohash. Eight characters is when it starts to give absu
 
 ## Implementation
 
-A reference implementation in JavaScript is provided in the repository for encoding and decoding Base64 Geohashes. Other implementations can be easily derived from the specification above.
+A demo implementation is provided in the repository for encoding and decoding Base64 Geohashes. Other implementations can be easily derived from the specification above.
