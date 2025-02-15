@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo64 Map</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        body, html { height: 100%; margin: 0; }
+        #map { height: 70vh; }
+        #controls { padding: 10px; text-align: center; }
+        #geohashOutput { font-family: monospace; background: #f4f4f4; padding: 5px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <label for="precision">Precision:</label>
+        <input type="range" id="precision" min="4" max="12" value="8">
+        <p>Geo64: <span id="geohashOutput">Click on the map</span></p>
+        <input type="text" id="geohashInput" placeholder="Enter Geo64 code">
+        <button onclick="decodeGeohash()">Decode</button>
+    </div>
+
+    <script>
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let rectangle;
+
+        function toBase64Geohash(lat, lon, precision = 8) {
+            let latRange = [-90, 90], lonRange = [-180, 180];
+            let bits = [];
+            let even = true;
+            
+            while (bits.length < precision * 6) {
+                if (even) {
+                    let mid = (lonRange[0] + lonRange[1]) / 2;
+                    bits.push(lon > mid ? 1 : 0);
+                    lonRange[lon > mid ? 0 : 1] = mid;
+                } else {
+                    let mid = (latRange[0] + latRange[1]) / 2;
+                    bits.push(lat > mid ? 1 : 0);
+                    latRange[lat > mid ? 0 : 1] = mid;
+                }
+                even = !even;
+            }
+
+            let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            return bits.reduce((acc, bit, i) => {
+                if (i % 6 === 0) acc.push(0);
+                acc[acc.length - 1] = (acc[acc.length - 1] << 1) | bit;
+                return acc;
+            }, []).map(index => base64[index]).join('');
+        }
+
+        function fromBase64Geohash(geohash) {
+            let latRange = [-90, 90], lonRange = [-180, 180];
+            let bits = [];
+            let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+            for (let char of geohash) {
+                let value = base64.indexOf(char);
+                for (let i = 5; i >= 0; i--) {
+                    bits.push((value >> i) & 1);
+                }
+            }
+
+            let even = true;
+            for (let bit of bits) {
+                if (even) {
+                    let mid = (lonRange[0] + lonRange[1]) / 2;
+                    lonRange[bit ? 0 : 1] = mid;
+                } else {
+                    let mid = (latRange[0] + latRange[1]) / 2;
+                    latRange[bit ? 0 : 1] = mid;
+                }
+                even = !even;
+            }
+            return { lat: (latRange[0] + latRange[1]) / 2, lon: (lonRange[0] + lonRange[1]) / 2, 
+                     latBounds: latRange, lonBounds: lonRange };
+        }
+
+        map.on('click', function (e) {
+            let precision = document.getElementById('precision').value;
+            let geohash = toBase64Geohash(e.latlng.lat, e.latlng.lng, precision);
+            document.getElementById('geohashOutput').textContent = geohash;
+        });
+
+        function decodeGeohash() {
+            let input = document.getElementById('geohashInput').value;
+            if (!input) return;
+            let { lat, lon, latBounds, lonBounds } = fromBase64Geohash(input);
+            
+            if (rectangle) map.removeLayer(rectangle);
+            rectangle = L.rectangle([
+                [latBounds[0], lonBounds[0]],
+                [latBounds[1], lonBounds[1]]
+            ], { color: "red", weight: 2 }).addTo(map);
+            
+            map.fitBounds(rectangle.getBounds());
+        }
+    </script>
+</body>
+</html>
+
