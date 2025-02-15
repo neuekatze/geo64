@@ -3,7 +3,7 @@
 
 ## Introduction
 
-Geo64 is an alternative geospatial encoding format based on the traditional Geohash, but it instaed uses Base64 instead of Base32. This makes it even more compact while maintaining precision and efficiency in encoding and decoding geographical coordinates.
+Geo64 is an alternative geospatial encoding format based on the traditional Geohash, but it uses Base64 instead of Base32. This makes it even more compact while maintaining precision and efficiency in encoding and decoding geographical coordinates.
 
 ## Encoding Process
 
