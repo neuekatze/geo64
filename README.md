@@ -1,5 +1,5 @@
 
-# Base64 Geohash Specification
+# Geo64
 
 ## Introduction
 
