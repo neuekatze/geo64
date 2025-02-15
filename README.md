@@ -64,3 +64,4 @@ It is more compact than Geohash. Eight characters is when it starts to give absu
 ## Implementation
 
 A demo implementation is provided in the repository for encoding and decoding Base64 Geohashes. Other implementations can be easily derived from the specification above.
+[CLICK HERE FOR DEMO](https://neuekatze.github.io/geo64/demo.html)
