@@ -17,9 +17,9 @@
     <div id="map"></div>
     <div id="controls">
         <label for="precision">Precision:</label>
-        <input type="range" id="precision" min="2" max="12" value="5">
+        <input type="range" id="precision" min="1" max="12" value="3">
         <p>Geo64: <span id="geohashOutput">Click on the map</span></p>
-        <input type="text" id="geohashInput" placeholder="Enter Geo64 code">
+        <input type="text" id="geohashInput" placeholder="Enter Base64 Geohash">
         <button onclick="decodeGeohash()">Decode</button>
     </div>
 
@@ -85,6 +85,16 @@
             let precision = document.getElementById('precision').value;
             let geohash = toBase64Geohash(e.latlng.lat, e.latlng.lng, precision);
             document.getElementById('geohashOutput').textContent = geohash;
+            
+            let { latBounds, lonBounds } = fromBase64Geohash(geohash);
+            
+            if (rectangle) map.removeLayer(rectangle);
+            rectangle = L.rectangle([
+                [latBounds[0], lonBounds[0]],
+                [latBounds[1], lonBounds[1]]
+            ], { color: "blue", weight: 2 }).addTo(map);
+            
+            map.fitBounds(rectangle.getBounds());
         });
 
         function decodeGeohash() {
@@ -103,4 +113,3 @@
     </script>
 </body>
 </html>
-
