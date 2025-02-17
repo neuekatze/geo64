@@ -13,6 +13,9 @@
         #geohashOutput { font-family: monospace; background: #f4f4f4; padding: 5px; display: inline-block; }
         #toaqOutput { font-family: monospace; background: #f4f4f4; padding: 5px; display: inline-block; }
     </style>
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+
 </head>
     <div id="map"></div>
     <div id="controls">
@@ -156,6 +159,10 @@
             if (marker) map.removeLayer(marker);
             marker = L.marker([lat, lon]).addTo(map);
         }
+        L.Control.geocoder({
+            defaultMarkGeocode: true
+        }).addTo(map);
+
     </script>
 </body>
 </html>
