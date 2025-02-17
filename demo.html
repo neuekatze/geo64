@@ -40,7 +40,7 @@
             let latRange = [-90, 90], lonRange = [-180, 180];
             let bits = [];
             let even = true;
-            let lon = longt % 180
+            let lon = longt > 0 ? longt % 180 : ((n % 180) + 180) % 180);
             
             while (bits.length < precision * 6) {
                 if (even) {
