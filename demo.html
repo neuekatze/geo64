@@ -33,11 +33,11 @@
         const toaq = {"A": "ba", "I": "be", "Q": "bi", "Y": "bo", "g": "bu", "o": "baq", "w": "beq", "4": "biq", "B": "sa", "J": "se", "R": "si", "Z": "so", "h": "su", "p": "saq", "x": "seq", "5": "siq", "C": "ta", "K": "te", "S": "ti", "a": "to", "i": "tu", "q": "taq", "y": "teq", "6": "tiq", "D": "fa", "L": "fe", "T": "fi", "b": "fo", "j": "fu", "r": "faq", "z": "feq", "7": "fiq", "E": "ra", "M": "re", "U": "ri", "c": "ro", "k": "ru", "s": "raq", "0": "req", "8": "riq", "F": "sha", "N": "she", "V": "shi", "d": "sho", "l": "shu", "t": "shaq", "1": "sheq", "9": "shiq", "G": "ja", "O": "je", "W": "ji", "e": "jo", "m": "ju", "u": "jaq", "2": "jeq", "+": "jiq", "H": "ka", "P": "ke", "X": "ki", "f": "ko", "n": "ku", "v": "kaq", "3": "keq", "/": "kiq"}
         const syllableMap = Object.fromEntries(Object.entries(toaq).map(([key, value]) => [value, key]));
 
-        function toBase64Geohash(lati, lon, precision = 3) {
+        function toBase64Geohash(lat, longt, precision = 3) {
             let latRange = [-90, 90], lonRange = [-180, 180];
             let bits = [];
             let even = true;
-            let lat = lati % 180
+            let lon = longt % 180
             
             while (bits.length < precision * 6) {
                 if (even) {
