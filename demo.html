@@ -11,25 +11,29 @@
         #map { height: 70vh; }
         #controls { padding: 10px; text-align: center; }
         #geohashOutput { font-family: monospace; background: #f4f4f4; padding: 5px; display: inline-block; }
+        #toaqOutput { font-family: monospace; background: #f4f4f4; padding: 5px; display: inline-block; }
     </style>
 </head>
-<body>
     <div id="map"></div>
     <div id="controls">
+        <h3>Geohash Tool</h3>
         <label for="precision">Precision:</label>
-        <input type="range" id="precision" min="1" max="12" value="2">
-        <p>Geo64: <span id="geohashOutput">Click on the map</span></p>
+        <input type="range" id="precision" min="1" max="12" value="3" oninput="updateRectangle()">
+        <p>Base64 Geohash: <span id="geohashOutput">Click on the map</span></p>
+        <p>Toaq: <span id="toaqOutput">Click on the map</span></p>
         <input type="text" id="geohashInput" placeholder="Enter Base64 Geohash">
         <button onclick="decodeGeohash()">Decode</button>
-        <p>Use the wheel on the mouse or two fingers on the touchpad to zoom in or out</p>
     </div>
+
 
     <script>
         const map = L.map('map').setView([0, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        let rectangle;
+        let rectangle, marker, selectedPoint, clickedMarker;
+        const toaq = {"A": "ba", "I": "be", "Q": "bi", "Y": "bo", "g": "bu", "o": "baq", "w": "beq", "4": "biq", "B": "sa", "J": "se", "R": "si", "Z": "so", "h": "su", "p": "saq", "x": "seq", "5": "siq", "C": "ta", "K": "te", "S": "ti", "a": "to", "i": "tu", "q": "taq", "y": "teq", "6": "tiq", "D": "fa", "L": "fe", "T": "fi", "b": "fo", "j": "fu", "r": "faq", "z": "feq", "7": "fiq", "E": "ra", "M": "re", "U": "ri", "c": "ro", "k": "ru", "s": "raq", "0": "req", "8": "riq", "F": "sha", "N": "she", "V": "shi", "d": "sho", "l": "shu", "t": "shaq", "1": "sheq", "9": "shiq", "G": "ja", "O": "je", "W": "ji", "e": "jo", "m": "ju", "u": "jaq", "2": "jeq", "+": "jiq", "H": "ka", "P": "ke", "X": "ki", "f": "ko", "n": "ku", "v": "kaq", "3": "keq", "/": "kiq"}
+        const syllableMap = Object.fromEntries(Object.entries(toaq).map(([key, value]) => [value, key]));
 
-        function toBase64Geohash(lat, lon, precision = 8) {
+        function toBase64Geohash(lat, lon, precision = 3) {
             let latRange = [-90, 90], lonRange = [-180, 180];
             let bits = [];
             let even = true;
@@ -83,10 +87,51 @@
         }
 
         map.on('click', function (e) {
-            let precision = document.getElementById('precision').value;
-            let geohash = toBase64Geohash(e.latlng.lat, e.latlng.lng, precision);
-            document.getElementById('geohashOutput').textContent = geohash;
+            selectedPoint = e.latlng;
+            updateRectangle();
             
+            if (clickedMarker) map.removeLayer(clickedMarker);
+            clickedMarker = L.marker(selectedPoint).addTo(map);
+        });
+
+        function base64ToToaq(input) {
+          let result = '';
+
+          for (let char of input) {
+            result += toaq[char];}
+          return "mọ" + result;
+        }
+        function toaqToBase64(input) {
+          // Remove all space characters
+          const cleanedInput = input.replace(/\s+/g, '');
+          
+          // Check if it starts with 'mọ'
+          if (!cleanedInput.startsWith('mọ')) {
+            return cleanedInput;
+          }
+          
+          // Extract the part after 'mọ'
+          const toaqgeist = cleanedInput.slice(2);
+          console.log(toaqgeist);
+          syllablesSplit = toaqgeist.split(/(?<=[aeiou](?:q)?)(?=[bstfrjk]|$)/);
+          console.log(syllablesSplit);
+          
+          // Convert to syllabic representation, ensuring correct segmentation
+          let result = '';
+          for (let syll of syllablesSplit) {
+              result += syllableMap[syll];
+          }
+          
+          return result;
+        }
+
+        function updateRectangle() {
+            if (!selectedPoint) return;
+            let precision = document.getElementById('precision').value;
+            let geohash = toBase64Geohash(selectedPoint.lat, selectedPoint.lng, precision);
+            document.getElementById('geohashOutput').textContent = geohash;
+            document.getElementById('toaqOutput').textContent = base64ToToaq(geohash);
+            console.log("çalışıver oç "+base64ToToaq(geohash) + geohash);
             let { latBounds, lonBounds } = fromBase64Geohash(geohash);
             
             if (rectangle) map.removeLayer(rectangle);
@@ -94,10 +139,10 @@
                 [latBounds[0], lonBounds[0]],
                 [latBounds[1], lonBounds[1]]
             ], { color: "blue", weight: 2 }).addTo(map);
-        });
+        }
 
         function decodeGeohash() {
-            let input = document.getElementById('geohashInput').value;
+            let input = toaqToBase64(document.getElementById('geohashInput').value);
             if (!input) return;
             let { lat, lon, latBounds, lonBounds } = fromBase64Geohash(input);
             
@@ -107,7 +152,8 @@
                 [latBounds[1], lonBounds[1]]
             ], { color: "red", weight: 2 }).addTo(map);
             
-            map.fitBounds(rectangle.getBounds());
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map);
         }
     </script>
 </body>
